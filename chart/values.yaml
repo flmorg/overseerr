@@ -39,17 +39,10 @@ deployment:
       type: pvc
       typeName: storage-pvc
 
-infisicalSecrets:
-  - name: infisical-certificates
-    serviceTokenSecretName: service-token
-    secretsPath: /certificates
-    secretName: tls-secret
-    secretType: kubernetes.io/tls
-
 ingress:
   name: ingress
   hosts:
-    - host: ovrs.mariusne.com
+    - host: ovrs.@vault(secrets/data/domain main | DOMAIN_NAME)
       paths:
         - path: "/"
           pathType: Prefix
@@ -73,3 +66,10 @@ services:
       - name: http
         protocol: TCP
         port: 80
+
+vaultSecrets:
+  - name: tls-secret
+    path: secrets/certificates
+    templates:
+      tls.crt: "{% .Secrets.tls_crt %}"
+      tls.key: "{% .Secrets.tls_key %}"
